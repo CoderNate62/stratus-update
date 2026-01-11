@@ -1,5 +1,10 @@
 # Dependencies
 node_modules/
+functions/node_modules/
+
+# Environment files with secrets
+.env
+functions/.env
 
 # Environment/Config with secrets
 # Uncomment if you want to exclude your API key from git:

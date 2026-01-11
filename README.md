@@ -17,41 +17,53 @@ A clean, functional weather dashboard built with vanilla JavaScript and ES modul
 - **Recent Searches** - Quick access to last 5 searched cities
 - **Dynamic Backgrounds** - Background changes based on weather conditions
 - **Animated Weather Icons** - Subtle animations for different weather types
-- **Weather Alerts** - Display severe weather warnings when available
+- **Backend Proxy** - Firebase Functions for secure API key storage
 
 ---
 
-## 🚀 Getting Started
+## �️ Tech Stack
 
-### 1. Get an API Key
+| Category | Technology |
+|----------|------------|
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript (ES Modules) |
+| **Styling** | CSS Custom Properties, Flexbox, Grid, Animations |
+| **Backend** | Firebase Cloud Functions (Node.js 20) |
+| **Hosting** | Firebase Hosting |
+| **API** | OpenWeatherMap (Geocoding, Weather, Forecast) |
+| **Build** | No build tools required - runs directly in browser |
 
-1. Go to [OpenWeatherMap](https://openweathermap.org/api)
-2. Sign up for a free account
-3. Copy your API key
+---
 
-### 2. Configure the App
+## �🚀 Getting Started
 
-Open `js/config.js` and replace the placeholder:
+### Option 1: Direct Mode (Local Development)
 
-```javascript
-API_KEY: 'YOUR_API_KEY_HERE',  // ← Replace with your key
-```
+1. Get an API key from [OpenWeatherMap](https://openweathermap.org/api)
+2. Edit `js/config.js`:
+   ```javascript
+   MODE: 'direct',
+   API_KEY: 'your-api-key-here',
+   ```
+3. Run a local server: `npx serve .`
+4. Open http://localhost:3000
 
-### 3. Run Locally
+### Option 2: Firebase Hosting (Production)
 
-Since the app uses ES modules, you need a local server:
-
-**Using Node.js:**
-```bash
-npx serve .
-```
-
-**Using Python:**
-```bash
-python -m http.server 3000
-```
-
-Then open http://localhost:3000 in your browser.
+1. Install Firebase CLI: `npm install -g firebase-tools`
+2. Login: `firebase login`
+3. Create project: `firebase projects:create stratus-update`
+4. Set API key securely:
+   ```bash
+   firebase functions:config:set openweather.key="YOUR_API_KEY"
+   ```
+5. Install functions dependencies:
+   ```bash
+   cd functions && npm install && cd ..
+   ```
+6. Deploy:
+   ```bash
+   firebase deploy
+   ```
 
 ---
 
@@ -61,66 +73,33 @@ Then open http://localhost:3000 in your browser.
 stratus-update/
 ├── index.html          # Main HTML file
 ├── styles.css          # All styling (themes, animations)
+├── firebase.json       # Firebase config
 ├── README.md           # This file
-└── js/
-    ├── config.js       # API key & constants
-    ├── state.js        # Application state
-    ├── utils.js        # Helper functions
-    ├── storage.js      # localStorage handling
-    ├── api.js          # OpenWeatherMap API calls
-    ├── geolocation.js  # Browser geolocation
-    ├── ui.js           # DOM manipulation & rendering
-    ├── search.js       # Search & autocomplete
-    └── app.js          # Main entry point
+├── js/
+│   ├── config.js       # Mode & API settings
+│   ├── api.js          # API calls (supports proxy mode)
+│   ├── app.js          # Main entry point
+│   └── ...             # Other modules
+└── functions/
+    ├── index.js        # Cloud Functions (API proxy)
+    └── package.json    # Functions dependencies
 ```
 
 ---
 
-## 🎨 Customization
+## 🔒 Security
 
-### Themes
+The app supports two modes configured in `js/config.js`:
 
-The app supports dark and light themes. Colors are defined as CSS custom properties in `styles.css`:
+| Mode | API Key Location | Use Case |
+|------|------------------|----------|
+| `direct` | Client-side (visible) | Local development |
+| `proxy` | Server-side (secure) | Production |
 
-```css
-[data-theme="dark"] {
-    --color-bg: #0f172a;
-    --color-text: #f1f5f9;
-    /* ... */
-}
-
-[data-theme="light"] {
-    --color-bg: #f0f9ff;
-    --color-text: #0f172a;
-    /* ... */
-}
-```
-
-### Weather Backgrounds
-
-Dynamic backgrounds change based on weather conditions. Modify the `.weather-*` classes in `styles.css` to customize.
+In **proxy mode**, the API key is stored in Firebase Functions config and never exposed to the client.
 
 ---
 
-## 🛠️ Technologies
-
-- **HTML5** - Semantic markup
-- **CSS3** - Custom properties, animations, flexbox/grid
-- **JavaScript (ES Modules)** - Modern async/await, fetch API
-- **OpenWeatherMap API** - Weather data
-
----
-
-## 📝 API Endpoints Used
-
-| Endpoint | Purpose |
-|----------|---------|
-| `/geo/1.0/direct` | City name geocoding |
-| `/data/2.5/weather` | Current weather |
-| `/data/2.5/forecast` | 5-day forecast |
-
----
-
-## 📄 License
+## 📝 License
 
 MIT License - Feel free to use and modify!

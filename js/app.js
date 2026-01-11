@@ -21,8 +21,8 @@ function init() {
     // Initialize UI elements first (needed for all paths)
     UI.init();
 
-    // Check for API key
-    if (CONFIG.API_KEY === 'YOUR_API_KEY_HERE') {
+    // Check for API key only in direct mode
+    if (CONFIG.MODE === 'direct' && CONFIG.API_KEY === 'YOUR_API_KEY_HERE') {
         UI.showSetupInstructions();
         return;
     }
