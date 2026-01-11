@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<!--
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                      STRATUS UPDATE                           ║
+    ║              A Modern Weather Dashboard                       ║
+    ║                                                               ║
+    ║                    Coded by Nate                              ║
+    ╚═══════════════════════════════════════════════════════════════╝
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stratus Update - A clean, functional weather dashboard">
+    <meta name="theme-color" content="#0f172a">
+    <title>Stratus Update | Weather Dashboard</title>
+
+    <!-- Favicon (SVG cloud icon) -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Error Message Container -->
+        <div id="error-container" class="error-message" role="alert">
+            <span class="error-icon">⚠️</span>
+            <span id="error-text"></span>
+            <button id="error-retry" class="hidden">Retry</button>
+        </div>
+
+        <!-- Weather Alerts Container -->
+        <div id="weather-alerts" class="weather-alerts hidden" role="alert">
+            <div class="alert-header">
+                <span class="alert-icon">🚨</span>
+                <span class="alert-title">Weather Alert</span>
+                <button id="dismiss-alert" class="dismiss-alert" aria-label="Dismiss alert">×</button>
+            </div>
+            <p id="alert-text"></p>
+        </div>
+
+        <!-- Setup Instructions (shown when no API key) -->
+        <div id="setup-instructions" class="setup-instructions card hidden">
+            <h2>🔑 API Key Required</h2>
+            <p>To use Stratus Update, you need a free OpenWeatherMap API key:</p>
+            <ol style="text-align: left; max-width: 400px; margin: 1rem auto;">
+                <li>Go to <a href="https://openweathermap.org/api" target="_blank"
+                        style="color: var(--color-accent);">OpenWeatherMap</a></li>
+                <li>Sign up for a free account</li>
+                <li>Copy your API key</li>
+                <li>Open <code>js/config.js</code></li>
+                <li>Replace <code>'YOUR_API_KEY_HERE'</code> with your key</li>
+            </ol>
+            <code>API_KEY: 'paste-your-key-here'</code>
+        </div>
+
+        <!-- Main App Content -->
+        <div id="app-content">
+            <header>
+                <div class="header-top">
+                    <div class="logo">
+                        <div class="logo-icon">☁️</div>
+                        <h1>Stratus Update</h1>
+                    </div>
+                    <div class="header-controls">
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light mode">
+                            <span class="theme-icon">🌙</span>
+                        </button>
+                        <!-- Unit Toggle -->
+                        <div class="unit-toggle" role="group" aria-label="Temperature unit">
+                            <button id="unit-f" class="active" aria-pressed="true">°F</button>
+                            <button id="unit-c" aria-pressed="false">°C</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-wrapper">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="search-input" class="search-input" placeholder="Search for a city..."
+                                autocomplete="off" aria-label="Search for a city" aria-autocomplete="list"
+                                aria-controls="autocomplete-list">
+                            <span class="search-icon">🔍</span>
+                            <button class="clear-search" id="clear-search" aria-label="Clear search">×</button>
+                        </div>
+                        <div id="autocomplete-list" class="autocomplete-dropdown" role="listbox"></div>
+                    </div>
+                    <button id="location-btn" class="location-btn" aria-label="Use my location">
+                        <span class="location-icon">📍</span>
+                        <span class="btn-text">My Location</span>
+                    </button>
+                </div>
+            </header>
+
+            <main>
+                <!-- Loading Skeleton -->
+                <div id="loading-skeleton" class="loading-skeleton hidden">
+                    <section class="card current-weather">
+                        <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                        <div class="skeleton skeleton-text short" style="width: 25%;"></div>
+                        <div class="weather-main">
+                            <div class="skeleton skeleton-temp"></div>
+                            <div class="skeleton skeleton-icon"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                            </div>
+                        </div>
+                        <div class="weather-details">
+                            <div class="skeleton skeleton-detail"></div>
+                            <div class="skeleton skeleton-detail"></div>
+                            <div class="skeleton skeleton-detail"></div>
+                            <div class="skeleton skeleton-detail"></div>
+                        </div>
+                    </section>
+                    <section class="card forecast-section">
+                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                        <div class="forecast-cards">
+                            <div class="skeleton skeleton-detail"></div>
+                            <div class="skeleton skeleton-detail"></div>
+                            <div class="skeleton skeleton-detail"></div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Current Weather Card -->
+                <section id="weather-content" class="card current-weather" aria-label="Current weather">
+                    <div class="weather-header">
+                        <div class="location-info">
+                            <h2 id="city-name">--</h2>
+                            <p class="date-time" id="current-date">--</p>
+                        </div>
+                    </div>
+                    <div class="weather-main">
+                        <div class="temp-display">
+                            <span class="temp-value" id="current-temp">--</span>
+                            <span class="temp-unit" id="temp-unit">°F</span>
+                        </div>
+                        <!-- Animated Weather Icon Container -->
+                        <div id="weather-icon-container" class="weather-icon-container">
+                            <div id="weather-animation" class="weather-animation"></div>
+                            <img id="weather-icon" class="weather-icon" src="" alt="Weather icon" style="display:none;">
+                        </div>
+                        <div class="weather-condition">
+                            <p class="condition-text" id="condition-text">--</p>
+                            <p class="feels-like">Feels like <span id="feels-like">--</span></p>
+                        </div>
+                    </div>
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">🌡️</div>
+                            <div class="detail-info">
+                                <span class="detail-label">High / Low</span>
+                                <span class="detail-value"><span id="temp-high">--</span> / <span
+                                        id="temp-low">--</span></span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">💧</div>
+                            <div class="detail-info">
+                                <span class="detail-label">Humidity</span>
+                                <span class="detail-value" id="humidity">--%</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">💨</div>
+                            <div class="detail-info">
+                                <span class="detail-label">Wind</span>
+                                <span class="detail-value" id="wind">-- mph</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">🌧️</div>
+                            <div class="detail-info">
+                                <span class="detail-label">Precipitation</span>
+                                <span class="detail-value" id="precipitation">--%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3-Day Forecast Card -->
+                <section id="forecast-content" class="card forecast-section" aria-label="3-day forecast">
+                    <h3>3-Day Forecast</h3>
+                    <div id="forecast-cards" class="forecast-cards">
+                        <!-- Forecast cards inserted by JavaScript -->
+                    </div>
+                </section>
+            </main>
+
+            <footer>
+                <div id="recent-searches" class="recent-searches hidden">
+                    <div class="recent-header">
+                        <h4>Recent Searches</h4>
+                        <button id="clear-recent" class="clear-recent">Clear all</button>
+                    </div>
+                    <div id="recent-chips" class="recent-chips"></div>
+                </div>
+                <p class="last-updated">Last updated: <span id="last-updated">--</span></p>
+                <p class="credits">Coded by Nate</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

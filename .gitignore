@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment/Config with secrets
+# Uncomment if you want to exclude your API key from git:
+# js/config.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
