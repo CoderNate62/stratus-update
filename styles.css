@@ -736,10 +736,10 @@ main {
 }
 
 .detail-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--color-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
 }
 
 .detail-value {

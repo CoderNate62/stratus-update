@@ -103,3 +103,6 @@ In **proxy mode**, the API key is stored in Firebase Functions config and never 
 ## 📝 License
 
 MIT License - Feel free to use and modify!
+
+---
+Last Updated: January 24, 2026
